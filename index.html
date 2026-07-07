@@ -3,234 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Trends | O Panorama Atual</title>
-    <style>
-        /* ================= CSS ================= */
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.4);
+    <title>Mecânica Premium | Simulador de Orçamentos</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        accent: '#38bdf8',
+                        accentHover: '#0ea5e9'
+                    }
+                }
+            }
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-        }
-
-        header {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(180deg, #020617 0%, var(--bg-color) 100%);
-            border-bottom: 1px solid #334155;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            color: var(--accent);
-            text-shadow: 0 0 15px var(--accent-glow);
-            margin-bottom: 1rem;
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Grid de Cards */
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .tech-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #334155;
-            cursor: pointer;
-        }
-
-        .tech-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px var(--accent-glow);
-            border-color: var(--accent);
-        }
-
-        .tech-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .tech-title {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #e2e8f0;
-        }
-
-        .tech-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-stats {
-            background: #0f172a;
-            padding: 1rem;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-            border-top: 1px solid #334155;
-            margin-top: 4rem;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
-            }
+        /* Ajuste sutil para transições suaves */
+        .transition-all {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>O Ecossistema Tecnológico Atual</h1>
-        <p>Explore as tecnologias que estão moldando o presente e o futuro, e descubra o impacto global de cada uma delas com base em usuários e dispositivos conectados.</p>
-    </header>
+    <div id="root"></div>
 
-    <main class="container">
-        <div class="tech-grid" id="grid-container">
-            </div>
-    </main>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-    <footer>
-        <p>Desenvolvido com HTML, CSS e JavaScript.</p>
-    </footer>
+        // Base de dados de serviços segmentada por montadora
+        const serviçosPorMontadora = {
+            Honda: [
+                { id: 'h1', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 280, precoMaoDeObra: 120, descricao: 'Substituição das pastilhas de freio do eixo dianteiro com limpeza e lubrificação do sistema flutuante.' },
+                { id: 'h2', nome: 'Reparo / Troca do Motor de Arranque', precoPeca: 450, precoMaoDeObra: 220, descricao: 'Manutenção corretiva do motor de partida, incluindo substituição de escovas ou solenóide testado em bancada.' },
+                { id: 'h3', nome: 'Par de Amortecedores Dianteiros', precoPeca: 890, precoMaoDeObra: 350, descricao: 'Substituição dos amortecedores dianteiros, incluindo novos batentes, coifas e verificação de alinhamento.' },
+                { id: 'h4', nome: 'Troca de Óleo e Filtro do Motor', precoPeca: 190, precoMaoDeObra: 60, descricao: 'Substituição do lubrificante sintético conforme especificação da montadora e filtro de óleo de alta eficiência.' }
+            ],
+            Fiat: [
+                { id: 'f1', nome: 'Aditivo e Revisão do Sistema de Arrefecimento', precoPeca: 140, precoMaoDeObra: 130, descricao: 'Limpeza completa do sistema de radiador com maquinário e aplicação de aditivo concentrado de longa duração.' },
+                { id: 'f2', nome: 'Diagnóstico e Configuração do Módulo de Airbag', precoPeca: 580, precoMaoDeObra: 240, descricao: 'Varredura completa do sistema SRS, reparo de conexões ou substituição programada do módulo com scanner dedicado.' },
+                { id: 'f3', name: 'Kit de Correia Dentada e Tensor', precoPeca: 310, precoMaoDeObra: 290, descricao: 'Substituição preventiva da correia sincronizadora e rolamento tensor para proteção do motor.' },
+                { id: 'f4', name: 'Jogo de Velas de Ignição e Cabos', precoPeca: 240, precoMaoDeObra: 90, descricao: 'Troca do conjunto de ignição para restabelecer a queima ideal de combustível e a potência original.' }
+            ],
+            Volkswagen: [
+                { id: 'v1', name: 'Kit de Amortecedores Dianteiros', precoPeca: 790, precoMaoDeObra: 320, descricao: 'Instalação de novos amortecedores pressurizados estruturais e kits de proteção periférica.' },
+                { id: 'v2', name: 'Bomba d\'Água e Fluido G12/G13', precoPeca: 380, precoMaoDeObra: 260, descricao: 'Substituição da bomba d\'água mecânica preventiva/corretiva e abastecimento com aditivo normatizado.' },
+                { id: 'v3', name: 'Troca de Óleo 5W40 Sintético e Filtros', precoPeca: 230, precoMaoDeObra: 60, descricao: 'Lubrificante homologado VW com troca do filtro de óleo e filtro de combustível.' }
+            ],
+            Chevrolet: [
+                { id: 'c1', name: 'Kit de Embreagem Completo', precoPeca: 680, precoMaoDeObra: 450, descricao: 'Substituição do platô, disco e atuador hidráulico ou rolamento guia da transmissão.' },
+                { id: 'c2', name: 'Pastilhas e Discos de Freio Dianteiros', precoPeca: 490, precoMaoDeObra: 160, descricao: 'Substituição casada dos discos ventilados e pastilhas para garantir o perfeito assentamento do sistema.' }
+            ],
+            Toyota: [
+                { id: 't1', nome: 'Troca de Filtros e Óleo (0W20 Sintético)', precoPeca: 270, precoMaoDeObra: 70, descricao: 'Atendimento com lubrificante premium de baixa viscosidade e troca do elemento filtrante.' },
+                { id: 't2', nome: 'Pastilhas de Freio em Cerâmica', precoPeca: 360, precoMaoDeObra: 140, descricao: 'Instalação de pastilhas com composto cerâmico para maior eficiência térmica e menor geração de fuligem.' }
+            ]
+        };
 
-    <script>
-        /* ================= JAVASCRIPT ================= */
-        
-        // Base de dados das tecnologias
-        const tecnologias = [
-            {
-                icon: "🤖",
-                title: "Inteligência Artificial (LLMs)",
-                desc: "Modelos de linguagem gigantes e agentes generativos (como ChatGPT, Gemini e Copilot) que estão revolucionando a automação, a criação de código e o suporte ao cliente.",
-                statLabel: "Usuários Ativos",
-                statValue: "300M+",
-                targetNumber: 300
-            },
-            {
-                icon: "☁️",
-                title: "Cloud Computing",
-                desc: "A espinha dorsal da internet moderna. Provedores como AWS, Azure e Google Cloud permitem que empresas escalem sistemas complexos sem hardware físico.",
-                statLabel: "Empresas Clientes",
-                statValue: "15M+",
-                targetNumber: 15
-            },
-            {
-                icon: "📱",
-                title: "Sistemas Mobile (Android & iOS)",
-                desc: "O principal ponto de acesso à internet mundial. O desenvolvimento mobile e as lojas de aplicativos representam a maior vitrine de software da atualidade.",
-                statLabel: "Dispositivos Ativos",
-                statValue: "7 Bilhões+",
-                targetNumber: 7000
-            },
-            {
-                icon: "🌐",
-                title: "Web Stack (HTML/JS/CSS)",
-                desc: "O tripé da web continua sendo a base de tudo. Com frameworks modernos como React, Vue e Angular, a web se tornou uma plataforma de aplicações ricas.",
-                statLabel: "Desenvolvedores",
-                statValue: "30M+",
-                targetNumber: 30
-            },
-            {
-                icon: "📡",
-                title: "Internet das Coisas (IoT)",
-                desc: "Dispositivos inteligentes conectados à rede. Desde lâmpadas e smartwatches até sensores industriais e veículos autônomos.",
-                statLabel: "Dispositivos",
-                statValue: "15 Bilhões+",
-                targetNumber: 15000
-            },
-            {
-                icon: "🔒",
-                title: "Cibersegurança",
-                desc: "Com o aumento da digitalização, a proteção de dados e infraestruturas tornou-se a prioridade número um para manter a integridade dos sistemas.",
-                statLabel: "Investimento Global",
-                statValue: "$200 Bi+",
-                targetNumber: 200
-            }
-        ];
-
-        // Função para renderizar os cards na tela
-        function renderizarCards() {
-            const container = document.getElementById('grid-container');
+        function App() {
+            const montadoras = Object.keys(serviçosPorMontadora);
             
-            tecnologias.forEach((tech) => {
-                // Criando o elemento do card
-                const card = document.createElement('div');
-                card.className = 'tech-card';
-                
-                // Estrutura HTML do card
-                card.innerHTML = `
-                    <div class="tech-icon">${tech.icon}</div>
-                    <h2 class="tech-title">${tech.title}</h2>
-                    <p class="tech-desc">${tech.desc}</p>
-                    <div class="tech-stats">
-                        <span class="stat-label">${tech.statLabel}</span>
-                        <span class="stat-value">${tech.statValue}</span>
-                    </div>
-                `;
-                
-                container.appendChild(card);
-            });
+            // Estados do React para controle da interface
+            const [montadoraSelecionada, setMontadoraSelecionada] = useState(montadoras[0]);
+            const [serviçoSelecionado, setServiçoSelecionado] = useState(serviçosPorMontadora[montadoras[0]][0]);
+            const [incluirMaoDeObra, setIncluirMaoDeObra] = useState(true);
+
+            // Atualiza o serviço selecionado automaticamente quando a montadora muda
+            useEffect(() => {
+                setServiçoSelecionado(serviçosPorMontadora[montadoraSelecionada][0]);
+            }, [montadoraSelecionada]);
+
+            // Cálculos dinâmicos
+            const precoPeca = serviçoSelecionado ? serviçoSelecionado.precoPeca : 0;
+            const precoMaoDeObra = (serviçoSelecionado && incluirMaoDeObra) ? serviçoSelecionado.precoMaoDeObra : 0;
+            const valorTotal = precoPeca + precoMaoDeObra;
+
+            return (
+                <div className="min-h-screen flex flex-col justify-between">
+                    {/* Header */}
+                    <header className="border-b border-slate-700 bg-slate-950/60 backdrop-blur py-6 px-4 sticky top-0 z-50">
+                        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <span className="text-3xl">⚙️</span>
+                                <div>
+                                    <h1 className="text-xl font-bold tracking-tight text-white">MECÂNICA <span className="text-accent">PREMIUM</span></h1>
+                                    <p className="text-xs text-slate-400">Centro Automotivo Especializado Multimarcas</p>
+                                </div>
+                            </div>
+                            <nav className="flex gap-6 text-sm text-slate-300">
+                                <a href="#" className="hover:text-accent transition-all">Início</a>
+                                <a href="#" className="text-accent border-b border-accent pb-1">Orçamentos</a>
+                                <a href="#" className="hover:text-accent transition-all">Estrutura</a>
+                            </nav>
+                        </div>
+                    </header>
+
+                    {/* Conteúdo Principal */}
+                    <main className="max-w-6xl w-full mx-auto p-4 md:p-8 flex-grow">
+                        <div className="mb-8 text-center sm:text-left">
+                            <h2 className="text-3xl font-extrabold text-white tracking-tight">Simulador de Serviços e Peças</h2>
+                            <p className="text-slate-400 mt-2">Selecione o fabricante do seu veículo e configure os serviços com total transparência de valores.</p>
+                        </div>
+
+                        {/* Painel em Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                            
+                            {/* Coluna de Configurações (Esquerda) */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
+                                    
+                                    {/* Seletor de Montadora */}
+                                    <div>
+                                        <label className="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">1. Selecione a Montadora</label>
+                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                            {montadoras.map((brand) => (
+                                                <button
+                                                    key={brand}
+                                                    onClick={() => setMontadoraSelecionada(brand)}
+                                                    className={`py-3 px-4 rounded-xl font-medium border text-sm transition-all text-center ${
+                                                        montadoraSelecionada === brand 
+                                                        ? 'bg-accent border-accent text-slate-950 font-bold shadow-lg shadow-accent/20' 
+                                                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                                                    }`}
+                                                >
+                                                    {brand}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Seletor de Serviço/Peça */}
+                                    <div>
+                                        <label className="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">2. Escolha o Componente ou Serviço</label>
+                                        <div className="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
+                                            {serviçosPorMontadora[montadoraSelecionada].map((item) => (
+                                                <div 
+                                                    key={item.id}
+                                                    onClick={() => setServiçoSelecionado(item)}
+                                                    className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                                                        serviçoSelecionado?.id === item.id 
+                                                        ? 'bg-slate-900/80 border-accent' 
+                                                        : 'bg-slate-900/40 border-slate-700/60 hover:border-slate-600'
+                                                    }`}
+                                                >
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div>
+                                                            <h4 className="font-semibold text-slate-200">{item.nome}</h4>
+                                                            <p className="text-xs text-slate-400 mt-1">{item.descricao}</p>
+                                                        </div>
+                                                        <span className="text-sm font-bold text-slate-300 whitespace-nowrap">
+                                                            R$ {item.precoPeca.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Toggle Switch para Mão de Obra */}
+                                    <div className="pt-4 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                        <div>
+                                            <h4 className="font-semibold text-slate-200">Modalidade de Contratação</h4>
+                                            <p className="text-xs text-slate-400">Escolha se deseja incluir a instalação profissional ou apenas retirar a peça.</p>
+                                        </div>
+                                        
+                                        {/* Componente Switch */}
+                                        <div className="flex items-center bg-slate-900 p-1.5 rounded-xl border border-slate-700">
+                                            <button
+                                                onClick={() => setIncluirMaoDeObra(false)}
+                                                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${!incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}`}
+                                            >
+                                                Apenas Peça
+                                            </button>
+                                            <button
+                                                onClick={() => setIncluirMaoDeObra(true)}
+                                                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}`}
+                                            >
+                                                Peça + Instalação
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {/* Resumo do Orçamento (Direita) */}
+                            <div className="space-y-6">
+                                <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-600 shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl"></div>
+                                    
+                                    <h3 className="text-lg font-bold tracking-wide text-white border-b border-slate-700 pb-4 mb-4 flex items-center gap-2">
+                                        <span>📋</span> Resumo do Orçamento
+                                    </h3>
+
+                                    {/* Detalhamento de Valores */}
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-slate-400">Montadora:</span>
+                                            <span className="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">{montadoraSelecionada}</span>
+                                        </div>
+                                        <div className="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 leading-relaxed">
+                                            <span className="font-semibold text-accent block mb-0.5">Item selecionado:</span>
+                                            {serviçoSelecionado?.nome}
+                                        </div>
+
+                                        <div className="pt-2 space-y-2 border-t border-slate-700/60">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-slate-400">Valor bruto da peça:</span>
+                                                <span className="font-medium text-slate-200">R$ {precoPeca.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-slate-400">Mão de obra / Serviço:</span>
+                                                <span className="font-medium text-slate-200">
+                                                    {incluirMaoDeObra ? `R$ ${precoMaoDeObra.toFixed(2)}` : 'Não inclusa'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Bloco de Valor Total */}
+                                        <div className="pt-4 border-t-2 border-dashed border-slate-700 bg-slate-950/60 p-4 rounded-xl text-center">
+                                            <span className="text-xs uppercase tracking-widest font-bold text-slate-400 block mb-1">Valor Total Estimado</span>
+                                            <span className="text-3xl font-black text-accent tracking-tight">R$ {valorTotal.toFixed(2)}</span>
+                                        </div>
+                                        
+                                        <button className="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] mt-2 text-center text-sm uppercase tracking-wider">
+                                            Agendar Manutenção
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Box Adicional de Vantagens da Oficina */}
+                                <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3.5">
+                                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Diferenciais Técnicos {montadoraSelecionada}</h4>
+                                    <ul className="text-xs space-y-2.5 text-slate-300">
+                                        <li className="flex items-center gap-2">
+                                            <span className="text-accent text-sm">✓</span> Equipamentos de diagnóstico dedicados aos protocolos de comunicação da {montadoraSelecionada}.
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <span className="text-accent text-sm">✓</span> Garantia estendida de 1 ano para peças adquiridas e instaladas em nossa estrutura.
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <span className="text-accent text-sm">✓</span> Mecânicos treinados com ferramentais de precisão (torquímetros digitais e diagramas de fábrica).
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="border-t border-slate-800/80 bg-slate-950/40 text-center py-6 px-4 text-xs text-slate-500">
+                        <div className="max-w-6xl mx-auto">
+                            <p>© 2026 Centro Automotivo Premium. Todos os direitos reservados.</p>
+                            <p className="mt-1 text-slate-600">Interface desenvolvida dinamicamente com React, JSX e Tailwind CSS.</p>
+                        </div>
+                    </footer>
+                </div>
+            );
         }
 
-        // Executar quando a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            renderizarCards();
-        });
+        // Renderiza a aplicação na div #root
+        const root = React.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
