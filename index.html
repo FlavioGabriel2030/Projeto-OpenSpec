@@ -63,35 +63,99 @@
         // 1. Base de Dados
         const servicosPorMontadora = {
             Honda: [
-                { id: 'h1', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 280, precoMaoDeObra: 120, descricao: 'Substituição das pastilhas de freio do eixo dianteiro com limpeza e lubrificação do sistema flutuante.' },
-                { id: 'h2', nome: 'Reparo / Troca do Motor de Arranque', precoPeca: 450, precoMaoDeObra: 220, descricao: 'Manutenção corretiva do motor de partida, incluindo substituição de escovas ou solenóide testado em bancada.' },
-                { id: 'h3', nome: 'Par de Amortecedores Dianteiros', precoPeca: 890, precoMaoDeObra: 350, descricao: 'Substituição dos amortecedores dianteiros, incluindo novos batentes, coifas e verificação de alinhamento.' },
-                { id: 'h4', nome: 'Troca de Óleo e Filtro do Motor', precoPeca: 190, precoMaoDeObra: 60, descricao: 'Substituição do lubrificante sintético conforme especificação da montadora e filtro de óleo.' }
+                { id: 'h1', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 280, precoMaoDeObra: 120, descricao: 'Pastilhas cerâmicas para eixo dianteiro, compatíveis com Civic, Fit e HR-V.' },
+                { id: 'h2', nome: 'Filtro de Óleo do Motor', precoPeca: 45, precoMaoDeObra: 30, descricao: 'Elemento filtrante original de alta retenção para motores i-VTEC e Earth Dreams.' },
+                { id: 'h3', nome: 'Par de Amortecedores Dianteiros', precoPeca: 890, precoMaoDeObra: 350, descricao: 'Amortecedores pressurizados a gás com kit de batentes e coifas inclusos.' },
+                { id: 'h4', nome: 'Troca de Óleo e Filtro do Motor', precoPeca: 190, precoMaoDeObra: 60, descricao: 'Lubrificante sintético 0W20 e filtro conforme especificação Honda.' },
+                { id: 'h5', nome: 'Filtro de Ar do Motor', precoPeca: 85, precoMaoDeObra: 25, descricao: 'Filtro de admissão de papel tratado para melhor fluxo e proteção do motor.' },
+                { id: 'h6', nome: 'Jogo de Velas de Ignição', precoPeca: 220, precoMaoDeObra: 80, descricao: 'Velas iridium para motores flex e gasolina, vida útil estendida.' },
+                { id: 'h7', nome: 'Disco de Freio Dianteiro', precoPeca: 340, precoMaoDeObra: 150, descricao: 'Disco ventilado em ferro fundido com tratamento anticorrosivo.' }
             ],
             Fiat: [
-                { id: 'f1', nome: 'Aditivo e Revisão do Sistema de Arrefecimento', precoPeca: 140, precoMaoDeObra: 130, descricao: 'Limpeza completa do radiador e aplicação de aditivo concentrado de longa duração.' },
-                { id: 'f2', nome: 'Diagnóstico e Configuração do Módulo de Airbag', precoPeca: 580, precoMaoDeObra: 240, descricao: 'Varredura completa do sistema SRS, reparo de conexões ou substituição com scanner dedicado.' },
-                { id: 'f3', nome: 'Kit de Correia Dentada e Tensor', precoPeca: 310, precoMaoDeObra: 290, descricao: 'Substituição preventiva da correia sincronizadora e rolamento tensor.' }
+                { id: 'f1', nome: 'Filtro de Óleo', precoPeca: 38, precoMaoDeObra: 25, descricao: 'Filtro spin-on para motores Fire, E.torQ e Multijet.' },
+                { id: 'f2', nome: 'Kit de Pastilhas de Freio', precoPeca: 195, precoMaoDeObra: 110, descricao: 'Pastilhas semimetálicas para Argo, Mobi, Cronos e Strada.' },
+                { id: 'f3', nome: 'Kit de Correia Dentada e Tensor', precoPeca: 310, precoMaoDeObra: 290, descricao: 'Correia sincronizadora reforçada com rolamento tensor e guia.' },
+                { id: 'f4', nome: 'Filtro de Combustível', precoPeca: 95, precoMaoDeObra: 70, descricao: 'Elemento filtrante inline para proteção do sistema de injeção.' },
+                { id: 'f5', nome: 'Aditivo e Revisão do Arrefecimento', precoPeca: 140, precoMaoDeObra: 130, descricao: 'Limpeza do radiador e aditivo concentrado de longa duração.' },
+                { id: 'f6', nome: 'Bomba de Combustível', precoPeca: 420, precoMaoDeObra: 180, descricao: 'Bomba elétrica submersa para tanque, pressão nominal de fábrica.' },
+                { id: 'f7', nome: 'Filtro de Ar do Motor', precoPeca: 72, precoMaoDeObra: 20, descricao: 'Filtro de admissão para motores 1.0 e 1.3 Firefly.' }
             ],
             Volkswagen: [
-                { id: 'v1', nome: 'Kit de Amortecedores Dianteiros', precoPeca: 790, precoMaoDeObra: 320, descricao: 'Instalação de novos amortecedores pressurizados estruturais e kits de proteção.' },
-                { id: 'v2', nome: 'Bomba d\'Água e Fluido G12/G13', precoPeca: 380, precoMaoDeObra: 260, descricao: 'Substituição da bomba d\'água preventiva/corretiva e abastecimento com aditivo normatizado.' }
+                { id: 'v1', nome: 'Kit de Amortecedores Dianteiros', precoPeca: 790, precoMaoDeObra: 320, descricao: 'Amortecedores pressurizados para Polo, Virtus, T-Cross e Nivus.' },
+                { id: 'v2', nome: 'Bomba d\'Água e Fluido G12/G13', precoPeca: 380, precoMaoDeObra: 260, descricao: 'Bomba d\'água com vedador e fluido normatizado VW.' },
+                { id: 'v3', nome: 'Filtro de Óleo', precoPeca: 52, precoMaoDeObra: 30, descricao: 'Filtro cartucho para motores TSI e EA211.' },
+                { id: 'v4', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 265, precoMaoDeObra: 120, descricao: 'Pastilhas com baixo nível de ruído para freios a disco dianteiros.' },
+                { id: 'v5', nome: 'Filtro de Ar do Motor', precoPeca: 98, precoMaoDeObra: 25, descricao: 'Filtro de admissão de alta capacidade para motores turbo.' },
+                { id: 'v6', nome: 'Jogo de Velas de Ignição', precoPeca: 185, precoMaoDeObra: 75, descricao: 'Velas com eletrodo fino para motores TSI de injeção direta.' },
+                { id: 'v7', nome: 'Disco de Freio Dianteiro', precoPeca: 310, precoMaoDeObra: 140, descricao: 'Par de discos ventilados com tratamento anticorrosivo.' }
             ],
             Chevrolet: [
-                { id: 'c1', nome: 'Kit de Embreagem Completo', precoPeca: 680, precoMaoDeObra: 450, descricao: 'Substituição do platô, disco e atuador hidráulico da transmissão.' }
+                { id: 'c1', nome: 'Kit de Embreagem Completo', precoPeca: 680, precoMaoDeObra: 450, descricao: 'Platô, disco e rolamento para Onix, Prisma e Tracker manual.' },
+                { id: 'c2', nome: 'Filtro de Óleo', precoPeca: 42, precoMaoDeObra: 28, descricao: 'Filtro para motores 1.0 Turbo e 1.4 aspirados.' },
+                { id: 'c3', nome: 'Kit de Pastilhas de Freio', precoPeca: 175, precoMaoDeObra: 100, descricao: 'Pastilhas dianteiras para linha GM compacta.' },
+                { id: 'c4', nome: 'Par de Amortecedores Traseiros', precoPeca: 520, precoMaoDeObra: 200, descricao: 'Amortecedores a gás para eixo traseiro com kit de fixação.' },
+                { id: 'c5', nome: 'Correia do Alternador', precoPeca: 65, precoMaoDeObra: 45, descricao: 'Correia poly-V de acesso para alternador e ar-condicionado.' },
+                { id: 'c6', nome: 'Filtro de Ar do Motor', precoPeca: 78, precoMaoDeObra: 22, descricao: 'Filtro de admissão para motores Ecotec.' },
+                { id: 'c7', nome: 'Bateria 60Ah', precoPeca: 480, precoMaoDeObra: 40, descricao: 'Bateria selada livre de manutenção com 540A de partida.' }
             ],
             Toyota: [
-                { id: 't1', nome: 'Troca de Filtros e Óleo (0W20 Sintético)', precoPeca: 270, precoMaoDeObra: 70, descricao: 'Atendimento com lubrificante premium de baixa viscosidade e troca do elemento filtrante.' }
+                { id: 't1', nome: 'Troca de Filtros e Óleo (0W20 Sintético)', precoPeca: 270, precoMaoDeObra: 70, descricao: 'Revisão básica com lubrificante sintético e filtros originais.' },
+                { id: 't2', nome: 'Filtro de Ar do Motor', precoPeca: 92, precoMaoDeObra: 25, descricao: 'Filtro de admissão para Corolla, Yaris e Hilux flex.' },
+                { id: 't3', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 245, precoMaoDeObra: 110, descricao: 'Pastilhas cerâmicas de baixa emissão de pó.' },
+                { id: 't4', nome: 'Par de Amortecedores Dianteiros', precoPeca: 850, precoMaoDeObra: 320, descricao: 'Amortecedores originais com kit de coifas e batentes.' },
+                { id: 't5', nome: 'Kit de Correia Dentada', precoPeca: 295, precoMaoDeObra: 280, descricao: 'Correia sincronizadora e tensor para motores 1.8 e 2.0.' },
+                { id: 't6', nome: 'Filtro de Combustível', precoPeca: 110, precoMaoDeObra: 65, descricao: 'Filtro de linha para proteção dos bicos injetores.' },
+                { id: 't7', nome: 'Jogo de Velas de Ignição', precoPeca: 210, precoMaoDeObra: 85, descricao: 'Velas iridium para motores Dynamic Force e VVT-i.' }
             ]
         };
 
         const montadoras = Object.keys(servicosPorMontadora);
 
+        function gerarEstoqueAleatorio() {
+            return Math.floor(Math.random() * 31);
+        }
+
+        function inicializarEstoque() {
+            montadoras.forEach(m => {
+                servicosPorMontadora[m].forEach(peca => {
+                    peca.estoque = gerarEstoqueAleatorio();
+                });
+            });
+        }
+
+        function formatarEstoque(qtd) {
+            if (qtd === 0) return 'Sem estoque';
+            if (qtd <= 5) return `Estoque baixo: ${qtd} un.`;
+            return `${qtd} un. em estoque`;
+        }
+
+        function obterClasseEstoque(qtd) {
+            if (qtd === 0) return 'text-red-400 bg-red-950/50 border-red-800/60';
+            if (qtd <= 5) return 'text-amber-400 bg-amber-950/50 border-amber-800/60';
+            return 'text-emerald-400 bg-emerald-950/50 border-emerald-800/60';
+        }
+
+        inicializarEstoque();
+
+        const veiculosPorPlaca = {
+            'ABC1234': { montadora: 'Honda', modelo: 'Honda Civic Prata', ano: 2005 },
+            'XYZ9876': { montadora: 'Fiat', modelo: 'Fiat Strada 1.8', ano: 2018 },
+            'DEF5678': { montadora: 'Toyota', modelo: 'Toyota Corolla Branco', ano: 2020 }
+        };
+
+        function consultarVeiculoPorPlaca(placa) {
+            return veiculosPorPlaca[placa] || null;
+        }
+
         // 2. Estado da Aplicação
         let estado = {
+            placa: '',
+            modelo: '',
+            ano: '',
             montadora: montadoras[0],
             servico: servicosPorMontadora[montadoras[0]][0],
-            incluirMaoDeObra: true
+            incluirMaoDeObra: true,
+            filtroCatalogo: 'Todas'
         };
 
         // 3. Funções de Atualização de Estado
@@ -112,9 +176,104 @@
             renderizar();
         };
 
+        window.alterarPlaca = function(valor) {
+            estado.placa = valor.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 7);
+            renderizar();
+        };
+
+        window.consultarPlacaVeiculo = function() {
+    // NOVA REGRA: Só consulta se tiver exatos 7 caracteres. 
+    // Assim não dá erro no meio da digitação.
+    if (estado.placa.length < 7) {
+        return; 
+    }
+
+    const veiculo = consultarVeiculoPorPlaca(estado.placa);
+
+    if (veiculo) {
+        estado.modelo = veiculo.modelo;
+        estado.ano = String(veiculo.ano);
+        if (montadoras.includes(veiculo.montadora)) {
+            estado.montadora = veiculo.montadora;
+            estado.servico = servicosPorMontadora[veiculo.montadora][0];
+        }
+    } else {
+        estado.modelo = '';
+        estado.ano = '';
+        alert('Placa não encontrada no sistema. Verifique a digitação ou cadastre o veículo.');
+        estado.placa = ''; // Limpa a placa errada para o usuário tentar de novo
+    }
+
+    renderizar();
+};
+
+        window.alterarFiltroCatalogo = function(filtro) {
+            estado.filtroCatalogo = filtro;
+            renderizar();
+        };
+
+        function renderizarCardPeca(peca) {
+            return `
+                <div class="bg-slate-900/50 border border-slate-700/60 rounded-xl p-4 flex flex-col gap-3 hover:border-slate-600 transition-all">
+                    <div class="flex justify-between items-start gap-3">
+                        <h5 class="font-semibold text-slate-200 text-sm leading-snug">${peca.nome}</h5>
+                        <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${peca.precoPeca.toFixed(2)}</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed flex-grow">${peca.descricao}</p>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                        <span class="text-xs px-2.5 py-1 rounded-md border font-semibold ${obterClasseEstoque(peca.estoque)}">${formatarEstoque(peca.estoque)}</span>
+                        <span class="text-xs text-slate-500">${peca.estoque} un.</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarSecaoCatalogo(filtroCatalogo) {
+            const montadorasExibir = filtroCatalogo === 'Todas' ? montadoras : [filtroCatalogo];
+            const opcoesFiltro = ['Todas', ...montadoras];
+
+            return `
+                <div class="mt-12 pt-10 border-t border-slate-700/80">
+                    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                                <span>📦</span> Catálogo de Peças em Estoque
+                            </h2>
+                            <p class="text-slate-400 mt-2 text-sm">Consulte a disponibilidade de peças básicas por montadora.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            ${opcoesFiltro.map(op => `
+                                <button
+                                    onclick="alterarFiltroCatalogo('${op}')"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all
+                                    ${filtroCatalogo === op ? 'bg-accent border-accent text-slate-950 shadow shadow-accent/20' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}">
+                                    ${op}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        ${montadorasExibir.map(m => `
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-widest text-accent mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-accent"></span>
+                                    ${m}
+                                    <span class="text-slate-500 font-normal normal-case tracking-normal">${servicosPorMontadora[m].length} peças</span>
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    ${servicosPorMontadora[m].map(peca => renderizarCardPeca(peca)).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         // 4. Motor de Renderização (Manipulação do DOM)
         function renderizar() {
-            const { montadora, servico, incluirMaoDeObra } = estado;
+            const { placa, modelo, ano, montadora, servico, incluirMaoDeObra, filtroCatalogo } = estado;
             
             const precoMaoDeObra = incluirMaoDeObra ? servico.precoMaoDeObra : 0;
             const valorTotal = servico.precoPeca + precoMaoDeObra;
@@ -132,7 +291,45 @@
                         <div class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
                             
                             <div>
-                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">1. Selecione a Montadora</label>
+                                <label for="placa-veiculo" class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">1. Placa do Veículo</label>
+                                <input
+                                    id="placa-veiculo"
+                                    type="text"
+                                    value="${placa}"
+                                    oninput="alterarPlaca(this.value)"
+                                    onblur="consultarPlacaVeiculo()"
+                                    placeholder="Ex: ABC1234"
+                                    maxlength="7"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 uppercase tracking-widest font-semibold focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label for="modelo-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Modelo</label>
+                                        <input
+                                            id="modelo-veiculo"
+                                            type="text"
+                                            value="${modelo}"
+                                            readonly
+                                            placeholder="Consulte a placa..."
+                                            class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label for="ano-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Ano</label>
+                                        <input
+                                            id="ano-veiculo"
+                                            type="text"
+                                            value="${ano}"
+                                            readonly
+                                            placeholder="—"
+                                            class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">2. Selecione a Montadora</label>
                                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                                     ${montadoras.map(m => `
                                         <button 
@@ -146,7 +343,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">2. Escolha o Componente ou Serviço</label>
+                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">3. Escolha o Componente ou Serviço</label>
                                 <div class="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                                     ${servicosPorMontadora[montadora].map(s => `
                                         <div 
@@ -154,9 +351,10 @@
                                             class="p-4 rounded-xl border cursor-pointer transition-all 
                                             ${servico.id === s.id ? 'bg-slate-900/80 border-accent' : 'bg-slate-900/40 border-slate-700/60 hover:border-slate-600'}">
                                             <div class="flex justify-between items-start gap-4">
-                                                <div>
+                                                <div class="flex-grow">
                                                     <h4 class="font-semibold text-slate-200">${s.nome}</h4>
                                                     <p class="text-xs text-slate-400 mt-1">${s.descricao}</p>
+                                                    <span class="inline-block text-xs px-2 py-0.5 rounded-md border font-medium mt-2 ${obterClasseEstoque(s.estoque)}">${formatarEstoque(s.estoque)}</span>
                                                 </div>
                                                 <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${s.precoPeca.toFixed(2)}</span>
                                             </div>
@@ -188,12 +386,28 @@
 
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-400">Placa:</span>
+                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800 uppercase tracking-wider">${placa || 'Não informada'}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-400">Modelo:</span>
+                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${modelo || 'Não informado'}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-400">Ano:</span>
+                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${ano || 'Não informado'}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
                                     <span class="text-slate-400">Montadora:</span>
                                     <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${montadora}</span>
                                 </div>
                                 <div class="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 leading-relaxed">
                                     <span class="font-semibold text-accent block mb-0.5">Item selecionado:</span>
                                     ${servico.nome}
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-400">Disponibilidade:</span>
+                                    <span class="text-xs px-2.5 py-1 rounded-md border font-semibold ${obterClasseEstoque(servico.estoque)}">${formatarEstoque(servico.estoque)}</span>
                                 </div>
 
                                 <div class="pt-2 space-y-2 border-t border-slate-700/60">
@@ -228,9 +442,22 @@
                         </div>
                     </div>
                 </div>
+
+                ${renderizarSecaoCatalogo(filtroCatalogo)}
             `;
             
+            const focoPlaca = document.activeElement?.id === 'placa-veiculo';
+            const posicaoCursor = focoPlaca ? document.activeElement.selectionStart : null;
+
             document.getElementById('app').innerHTML = html;
+
+            if (focoPlaca) {
+                const inputPlaca = document.getElementById('placa-veiculo');
+                if (inputPlaca) {
+                    inputPlaca.focus();
+                    inputPlaca.setSelectionRange(posicaoCursor, posicaoCursor);
+                }
+            }
         }
 
         // 5. Inicialização
