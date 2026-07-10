@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mecânica Premium | Simulador de Orçamentos</title>
+    <title>Mecânica Premium | Gerenciador de OS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -44,425 +45,959 @@
             </div>
             <nav class="flex gap-6 text-sm text-slate-300">
                 <a href="#" class="hover:text-accent transition-all">Início</a>
-                <a href="#" class="text-accent border-b border-accent pb-1">Orçamentos</a>
+                <a href="#" data-tela="orcamentos" onclick="mudarTela('orcamentos'); return false;" class="text-accent border-b border-accent pb-1 transition-all">Orçamentos</a>
+                <a href="#" data-tela="ordens" onclick="mudarTela('ordens'); return false;" class="hover:text-accent transition-all">Ordens</a>
                 <a href="#" class="hover:text-accent transition-all">Estrutura</a>
+                <a href="#" data-tela="cadastro" onclick="mudarTela('cadastro'); return false;" class="hover:text-accent transition-all">Cadastro</a>
             </nav>
         </div>
     </header>
 
-    <div id="app" class="max-w-6xl w-full mx-auto p-4 md:p-8 flex-grow"></div>
+    <div id="app" class="max-w-6xl w-full mx-auto p-4 md:p-8 flex-grow">
+        <div class="text-center py-12 text-slate-400">Carregando dados do sistema...</div>
+    </div>
 
     <footer class="border-t border-slate-800/80 bg-slate-950/40 text-center py-6 px-4 text-xs text-slate-500">
         <div class="max-w-6xl mx-auto">
             <p>© 2026 Centro Automotivo Premium. Todos os direitos reservados.</p>
-            <p class="mt-1 text-slate-600">Interface desenvolvida com Vanilla JS e Tailwind CSS.</p>
+            <p class="mt-1 text-slate-600">Interface em tempo real integrada ao Supabase.</p>
         </div>
     </footer>
 
     <script>
-        // 1. Base de Dados
-        const servicosPorMontadora = {
-            Honda: [
-                { id: 'h1', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 280, precoMaoDeObra: 120, descricao: 'Pastilhas cerâmicas para eixo dianteiro, compatíveis com Civic, Fit e HR-V.' },
-                { id: 'h2', nome: 'Filtro de Óleo do Motor', precoPeca: 45, precoMaoDeObra: 30, descricao: 'Elemento filtrante original de alta retenção para motores i-VTEC e Earth Dreams.' },
-                { id: 'h3', nome: 'Par de Amortecedores Dianteiros', precoPeca: 890, precoMaoDeObra: 350, descricao: 'Amortecedores pressurizados a gás com kit de batentes e coifas inclusos.' },
-                { id: 'h4', nome: 'Troca de Óleo e Filtro do Motor', precoPeca: 190, precoMaoDeObra: 60, descricao: 'Lubrificante sintético 0W20 e filtro conforme especificação Honda.' },
-                { id: 'h5', nome: 'Filtro de Ar do Motor', precoPeca: 85, precoMaoDeObra: 25, descricao: 'Filtro de admissão de papel tratado para melhor fluxo e proteção do motor.' },
-                { id: 'h6', nome: 'Jogo de Velas de Ignição', precoPeca: 220, precoMaoDeObra: 80, descricao: 'Velas iridium para motores flex e gasolina, vida útil estendida.' },
-                { id: 'h7', nome: 'Disco de Freio Dianteiro', precoPeca: 340, precoMaoDeObra: 150, descricao: 'Disco ventilado em ferro fundido com tratamento anticorrosivo.' }
-            ],
-            Fiat: [
-                { id: 'f1', nome: 'Filtro de Óleo', precoPeca: 38, precoMaoDeObra: 25, descricao: 'Filtro spin-on para motores Fire, E.torQ e Multijet.' },
-                { id: 'f2', nome: 'Kit de Pastilhas de Freio', precoPeca: 195, precoMaoDeObra: 110, descricao: 'Pastilhas semimetálicas para Argo, Mobi, Cronos e Strada.' },
-                { id: 'f3', nome: 'Kit de Correia Dentada e Tensor', precoPeca: 310, precoMaoDeObra: 290, descricao: 'Correia sincronizadora reforçada com rolamento tensor e guia.' },
-                { id: 'f4', nome: 'Filtro de Combustível', precoPeca: 95, precoMaoDeObra: 70, descricao: 'Elemento filtrante inline para proteção do sistema de injeção.' },
-                { id: 'f5', nome: 'Aditivo e Revisão do Arrefecimento', precoPeca: 140, precoMaoDeObra: 130, descricao: 'Limpeza do radiador e aditivo concentrado de longa duração.' },
-                { id: 'f6', nome: 'Bomba de Combustível', precoPeca: 420, precoMaoDeObra: 180, descricao: 'Bomba elétrica submersa para tanque, pressão nominal de fábrica.' },
-                { id: 'f7', nome: 'Filtro de Ar do Motor', precoPeca: 72, precoMaoDeObra: 20, descricao: 'Filtro de admissão para motores 1.0 e 1.3 Firefly.' }
-            ],
-            Volkswagen: [
-                { id: 'v1', nome: 'Kit de Amortecedores Dianteiros', precoPeca: 790, precoMaoDeObra: 320, descricao: 'Amortecedores pressurizados para Polo, Virtus, T-Cross e Nivus.' },
-                { id: 'v2', nome: 'Bomba d\'Água e Fluido G12/G13', precoPeca: 380, precoMaoDeObra: 260, descricao: 'Bomba d\'água com vedador e fluido normatizado VW.' },
-                { id: 'v3', nome: 'Filtro de Óleo', precoPeca: 52, precoMaoDeObra: 30, descricao: 'Filtro cartucho para motores TSI e EA211.' },
-                { id: 'v4', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 265, precoMaoDeObra: 120, descricao: 'Pastilhas com baixo nível de ruído para freios a disco dianteiros.' },
-                { id: 'v5', nome: 'Filtro de Ar do Motor', precoPeca: 98, precoMaoDeObra: 25, descricao: 'Filtro de admissão de alta capacidade para motores turbo.' },
-                { id: 'v6', nome: 'Jogo de Velas de Ignição', precoPeca: 185, precoMaoDeObra: 75, descricao: 'Velas com eletrodo fino para motores TSI de injeção direta.' },
-                { id: 'v7', nome: 'Disco de Freio Dianteiro', precoPeca: 310, precoMaoDeObra: 140, descricao: 'Par de discos ventilados com tratamento anticorrosivo.' }
-            ],
-            Chevrolet: [
-                { id: 'c1', nome: 'Kit de Embreagem Completo', precoPeca: 680, precoMaoDeObra: 450, descricao: 'Platô, disco e rolamento para Onix, Prisma e Tracker manual.' },
-                { id: 'c2', nome: 'Filtro de Óleo', precoPeca: 42, precoMaoDeObra: 28, descricao: 'Filtro para motores 1.0 Turbo e 1.4 aspirados.' },
-                { id: 'c3', nome: 'Kit de Pastilhas de Freio', precoPeca: 175, precoMaoDeObra: 100, descricao: 'Pastilhas dianteiras para linha GM compacta.' },
-                { id: 'c4', nome: 'Par de Amortecedores Traseiros', precoPeca: 520, precoMaoDeObra: 200, descricao: 'Amortecedores a gás para eixo traseiro com kit de fixação.' },
-                { id: 'c5', nome: 'Correia do Alternador', precoPeca: 65, precoMaoDeObra: 45, descricao: 'Correia poly-V de acesso para alternador e ar-condicionado.' },
-                { id: 'c6', nome: 'Filtro de Ar do Motor', precoPeca: 78, precoMaoDeObra: 22, descricao: 'Filtro de admissão para motores Ecotec.' },
-                { id: 'c7', nome: 'Bateria 60Ah', precoPeca: 480, precoMaoDeObra: 40, descricao: 'Bateria selada livre de manutenção com 540A de partida.' }
-            ],
-            Toyota: [
-                { id: 't1', nome: 'Troca de Filtros e Óleo (0W20 Sintético)', precoPeca: 270, precoMaoDeObra: 70, descricao: 'Revisão básica com lubrificante sintético e filtros originais.' },
-                { id: 't2', nome: 'Filtro de Ar do Motor', precoPeca: 92, precoMaoDeObra: 25, descricao: 'Filtro de admissão para Corolla, Yaris e Hilux flex.' },
-                { id: 't3', nome: 'Kit de Pastilhas de Freio Dianteiro', precoPeca: 245, precoMaoDeObra: 110, descricao: 'Pastilhas cerâmicas de baixa emissão de pó.' },
-                { id: 't4', nome: 'Par de Amortecedores Dianteiros', precoPeca: 850, precoMaoDeObra: 320, descricao: 'Amortecedores originais com kit de coifas e batentes.' },
-                { id: 't5', nome: 'Kit de Correia Dentada', precoPeca: 295, precoMaoDeObra: 280, descricao: 'Correia sincronizadora e tensor para motores 1.8 e 2.0.' },
-                { id: 't6', nome: 'Filtro de Combustível', precoPeca: 110, precoMaoDeObra: 65, descricao: 'Filtro de linha para proteção dos bicos injetores.' },
-                { id: 't7', nome: 'Jogo de Velas de Ignição', precoPeca: 210, precoMaoDeObra: 85, descricao: 'Velas iridium para motores Dynamic Force e VVT-i.' }
-            ]
-        };
+        // INTERFACE DO SUPABASE (Variável renomeada para supabaseClient)
+const SUPABASE_URL = 'https://ucdjkgkrauobyzftdijf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_3TcBN2EflOLPafH-e_XgmA_XuiIfVZD'; 
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const montadoras = Object.keys(servicosPorMontadora);
+// Banco de dados em memória que será sincronizado com o Supabase
+let servicosPorMontadora = {};
+let montadoras = [];
 
-        function gerarEstoqueAleatorio() {
-            return Math.floor(Math.random() * 31);
-        }
+// Estado Global da Aplicação
+let estado = {
+    telaAtual: 'orcamentos',
+    placa: '',
+    modelo: '',
+    ano: '',
+    whatsapp: '',
+    montadora: '',
+    servico: null,
+    incluirMaoDeObra: true,
+    filtroCatalogo: 'Todas',
+    ordensSalvas: [],
+    osSelecionada: null,
+    carregando: true
+};
 
-        function inicializarEstoque() {
-            montadoras.forEach(m => {
-                servicosPorMontadora[m].forEach(peca => {
-                    peca.estoque = gerarEstoqueAleatorio();
-                });
+// Inicializa buscando as peças dinamicamente do Supabase
+async function carregarDadosDoBanco() {
+    try {
+        // Usando a variável corrigida supabaseClient
+        const { data, error } = await supabaseClient
+            .from('produtos_servicos')
+            .select('*');
+
+        if (error) throw error;
+
+        // Agrupa as peças por montadora dinamicamente
+        servicosPorMontadora = {};
+        data.forEach(item => {
+            if (!servicosPorMontadora[item.montadora]) {
+                servicosPorMontadora[item.montadora] = [];
+            }
+            servicosPorMontadora[item.montadora].push({
+                id: item.id,
+                nome: item.nome,
+                precoPeca: parseFloat(item.preco_peca),
+                precoMaoDeObra: parseFloat(item.preco_mao_de_obra),
+                descricao: item.descricao,
+                estoque: item.estoque
             });
+        });
+
+        montadoras = Object.keys(servicosPorMontadora);
+        
+        // Define valores padrão baseados no banco carregado
+        if (montadoras.length > 0) {
+            estado.montadora = montadoras[0];
+            estado.servico = servicosPorMontadora[montadoras[0]][0];
         }
+        
+        estado.carregando = false;
+        renderizar();
+    } catch (err) {
+        console.error("Erro ao carregar catálogo:", err);
+        document.getElementById('app').innerHTML = `<p class="text-red-400 text-center mt-12">Erro ao conectar ao banco de dados. Verifique a chave da API.</p>`;
+    }
+}
 
-        function formatarEstoque(qtd) {
-            if (qtd === 0) return 'Sem estoque';
-            if (qtd <= 5) return `Estoque baixo: ${qtd} un.`;
-            return `${qtd} un. em estoque`;
-        }
+function formatarEstoque(qtd) {
+    if (qtd === 0) return 'Sem estoque';
+    if (qtd <= 5) return `Estoque baixo: ${qtd} un.`;
+    return `${qtd} un. em estoque`;
+}
 
-        function obterClasseEstoque(qtd) {
-            if (qtd === 0) return 'text-red-400 bg-red-950/50 border-red-800/60';
-            if (qtd <= 5) return 'text-amber-400 bg-amber-950/50 border-amber-800/60';
-            return 'text-emerald-400 bg-emerald-950/50 border-emerald-800/60';
-        }
+function obterClasseEstoque(qtd) {
+    if (qtd === 0) return 'text-red-400 bg-red-950/50 border-red-800/60';
+    if (qtd <= 5) return 'text-amber-400 bg-amber-950/50 border-amber-800/60';
+    return 'text-emerald-400 bg-emerald-950/50 border-emerald-800/60';
+}
 
-        inicializarEstoque();
+function formatarDataOS(data) {
+    if (!data) return '—';
 
-        const veiculosPorPlaca = {
-            'ABC1234': { montadora: 'Honda', modelo: 'Honda Civic Prata', ano: 2005 },
-            'XYZ9876': { montadora: 'Fiat', modelo: 'Fiat Strada 1.8', ano: 2018 },
-            'DEF5678': { montadora: 'Toyota', modelo: 'Toyota Corolla Branco', ano: 2020 }
-        };
+    const dataOS = new Date(data);
+    if (Number.isNaN(dataOS.getTime())) return '—';
 
-        function consultarVeiculoPorPlaca(placa) {
-            return veiculosPorPlaca[placa] || null;
-        }
+    return dataOS.toLocaleDateString('pt-BR');
+}
 
-        // 2. Estado da Aplicação
-        let estado = {
-            placa: '',
-            modelo: '',
-            ano: '',
-            montadora: montadoras[0],
-            servico: servicosPorMontadora[montadoras[0]][0],
-            incluirMaoDeObra: true,
-            filtroCatalogo: 'Todas'
-        };
+function formatarValorEmReais(valor) {
+    return Number(valor || 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
 
-        // 3. Funções de Atualização de Estado
-        window.alterarMontadora = function(novaMontadora) {
-            estado.montadora = novaMontadora;
-            estado.servico = servicosPorMontadora[novaMontadora][0]; // Reseta para o primeiro serviço da nova marca
-            renderizar();
-        };
+// Funções de Evento Globais
+window.alterarMontadora = function(novaMontadora) {
+    estado.montadora = novaMontadora;
+    estado.servico = servicosPorMontadora[novaMontadora][0];
+    renderizar();
+};
 
-        window.alterarServico = function(idServico) {
-            const servicoEncontrado = servicosPorMontadora[estado.montadora].find(s => s.id === idServico);
-            if(servicoEncontrado) estado.servico = servicoEncontrado;
-            renderizar();
-        };
+window.alterarServico = function(idServico) {
+    const servicoEncontrado = servicosPorMontadora[estado.montadora].find(s => s.id === idServico);
+    if(servicoEncontrado) estado.servico = servicoEncontrado;
+    renderizar();
+};
 
-        window.alterarMaoDeObra = function(valor) {
-            estado.incluirMaoDeObra = valor;
-            renderizar();
-        };
+window.alterarMaoDeObra = function(valor) {
+    estado.incluirMaoDeObra = valor;
+    renderizar();
+};
 
-        window.alterarPlaca = function(valor) {
-            estado.placa = valor.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 7);
-            renderizar();
-        };
-
-        window.consultarPlacaVeiculo = function() {
-    // NOVA REGRA: Só consulta se tiver exatos 7 caracteres. 
-    // Assim não dá erro no meio da digitação.
+window.alterarPlaca = function(valor) {
+    estado.placa = valor.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 7);
+    // Se o usuário apagar o campo, limpa os metadados do veículo
     if (estado.placa.length < 7) {
-        return; 
+        estado.modelo = '';
+        estado.ano = '';
+        estado.whatsapp = '';
+    }
+    renderizar();
+};
+
+window.consultarPlacaVeiculo = async function() {
+    if (estado.placa.length !== 7) return;
+
+    // Usando a variável corrigida supabaseClient
+    const { data, error } = await supabaseClient
+        .from('veiculos')
+        .select('*')
+        .eq('placa', estado.placa)
+        .maybeSingle();
+
+    if (error) {
+        estado.modelo = '';
+        estado.ano = '';
+        estado.whatsapp = '';
+        console.error("Erro na busca da placa:", error);
+        renderizar();
+        return;
     }
 
-    const veiculo = consultarVeiculoPorPlaca(estado.placa);
-
-    if (veiculo) {
-        estado.modelo = veiculo.modelo;
-        estado.ano = String(veiculo.ano);
-        if (montadoras.includes(veiculo.montadora)) {
-            estado.montadora = veiculo.montadora;
-            estado.servico = servicosPorMontadora[veiculo.montadora][0];
+    if (data) {
+        estado.modelo = data.modelo;
+        estado.ano = String(data.ano);
+        estado.whatsapp = data.whatsapp || '';
+        if (montadoras.includes(data.montadora)) {
+            estado.montadora = data.montadora;
+            estado.servico = servicosPorMontadora[data.montadora][0];
         }
     } else {
         estado.modelo = '';
         estado.ano = '';
-        alert('Placa não encontrada no sistema. Verifique a digitação ou cadastre o veículo.');
-        estado.placa = ''; // Limpa a placa errada para o usuário tentar de novo
+        estado.whatsapp = '';
+        alert('Placa não encontrada no banco de dados. Você pode continuar simulando, mas informe um carro cadastrado para salvar a OS.');
     }
 
     renderizar();
 };
 
-        window.alterarFiltroCatalogo = function(filtro) {
-            estado.filtroCatalogo = filtro;
-            renderizar();
-        };
+window.alterarFiltroCatalogo = function(filtro) {
+    estado.filtroCatalogo = filtro;
+    renderizar();
+};
 
-        function renderizarCardPeca(peca) {
-            return `
-                <div class="bg-slate-900/50 border border-slate-700/60 rounded-xl p-4 flex flex-col gap-3 hover:border-slate-600 transition-all">
-                    <div class="flex justify-between items-start gap-3">
-                        <h5 class="font-semibold text-slate-200 text-sm leading-snug">${peca.nome}</h5>
-                        <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${peca.precoPeca.toFixed(2)}</span>
-                    </div>
-                    <p class="text-xs text-slate-400 leading-relaxed flex-grow">${peca.descricao}</p>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-800">
-                        <span class="text-xs px-2.5 py-1 rounded-md border font-semibold ${obterClasseEstoque(peca.estoque)}">${formatarEstoque(peca.estoque)}</span>
-                        <span class="text-xs text-slate-500">${peca.estoque} un.</span>
-                    </div>
-                </div>
-            `;
+window.mudarTela = function(novaTela) {
+    estado.telaAtual = novaTela;
+    renderizar();
+
+    if (novaTela === 'ordens') {
+        window.carregarOrdens();
+    }
+};
+
+window.carregarOrdens = async function() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('ordens_servico')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        estado.ordensSalvas = data || [];
+        renderizar();
+    } catch (err) {
+        console.error('Erro ao carregar ordens de serviço:', err);
+        alert('Não foi possível carregar as ordens de serviço.');
+    }
+};
+
+window.atualizarStatusOS = async function(id, novoStatus) {
+    const ordem = estado.ordensSalvas.find(item => item.id === id);
+    const statusAnterior = ordem?.status;
+
+    if (ordem) {
+        ordem.status = novoStatus;
+        renderizar();
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('ordens_servico')
+            .update({ status: novoStatus })
+            .eq('id', id);
+
+        if (error) throw error;
+    } catch (err) {
+        if (ordem) {
+            ordem.status = statusAnterior;
+            renderizar();
         }
 
-        function renderizarSecaoCatalogo(filtroCatalogo) {
-            const montadorasExibir = filtroCatalogo === 'Todas' ? montadoras : [filtroCatalogo];
-            const opcoesFiltro = ['Todas', ...montadoras];
+        console.error('Erro ao atualizar status da ordem de serviço:', err);
+        alert('Não foi possível atualizar o status da ordem de serviço.');
+    }
+};
 
-            return `
-                <div class="mt-12 pt-10 border-t border-slate-700/80">
-                    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <h2 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                                <span>📦</span> Catálogo de Peças em Estoque
-                            </h2>
-                            <p class="text-slate-400 mt-2 text-sm">Consulte a disponibilidade de peças básicas por montadora.</p>
+window.abrirDetalhesOS = function(idOS) {
+    const ordem = estado.ordensSalvas.find(item => item.id === idOS);
+    if (!ordem) return;
+
+    let detalhesPeca = null;
+
+    for (const servicos of Object.values(servicosPorMontadora)) {
+        detalhesPeca = servicos.find(peca => String(peca.id) === String(ordem.servico_id));
+
+        if (detalhesPeca) break;
+    }
+
+    estado.osSelecionada = { ...ordem, detalhesPeca };
+    renderizar();
+};
+
+window.fecharDetalhesOS = function() {
+    estado.osSelecionada = null;
+    renderizar();
+};
+
+window.cadastrarVeiculo = async function() {
+    const placa = document.getElementById('cadastro-veiculo-placa').value.trim().toUpperCase();
+    const whatsapp = document.getElementById('cadastro-veiculo-whatsapp').value.replace(/\D/g, '');
+    const montadora = document.getElementById('cadastro-veiculo-montadora').value;
+    const modelo = document.getElementById('cadastro-veiculo-modelo').value.trim();
+    const ano = Number.parseInt(document.getElementById('cadastro-veiculo-ano').value, 10);
+
+    if (!placa || !whatsapp || !montadora || !modelo || !Number.isInteger(ano)) {
+        alert('Preencha todos os campos do veículo corretamente.');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('veiculos')
+            .insert([{
+                placa,
+                whatsapp,
+                montadora,
+                modelo,
+                ano
+            }]);
+
+        if (error) throw error;
+
+        alert(`Veículo de placa ${placa} cadastrado com sucesso!`);
+        document.getElementById('form-cadastro-veiculo').reset();
+    } catch (err) {
+        console.error('Erro ao cadastrar veículo:', err);
+        alert('Não foi possível cadastrar o veículo. Verifique se a placa já está cadastrada.');
+    }
+};
+
+window.cadastrarProduto = async function() {
+    const id = document.getElementById('cadastro-produto-id').value.trim();
+    const nome = document.getElementById('cadastro-produto-nome').value.trim();
+    const precoPeca = Number.parseFloat(document.getElementById('cadastro-produto-preco-peca').value);
+    const precoMaoDeObra = Number.parseFloat(document.getElementById('cadastro-produto-preco-mao-obra').value);
+    const descricao = document.getElementById('cadastro-produto-descricao').value.trim();
+    const estoque = Number.parseInt(document.getElementById('cadastro-produto-estoque').value, 10);
+    const montadora = document.getElementById('cadastro-produto-montadora').value;
+
+    if (!id || !nome || !Number.isFinite(precoPeca) || !Number.isFinite(precoMaoDeObra) || !descricao || !Number.isInteger(estoque) || !montadora) {
+        alert('Preencha todos os campos da peça ou serviço corretamente.');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('produtos_servicos')
+            .insert([{
+                id,
+                nome,
+                preco_peca: precoPeca,
+                preco_mao_de_obra: precoMaoDeObra,
+                descricao,
+                estoque,
+                montadora
+            }]);
+
+        if (error) throw error;
+
+        await carregarDadosDoBanco();
+        document.getElementById('form-cadastro-produto')?.reset();
+        alert(`${nome} foi adicionado ao catálogo com sucesso!`);
+    } catch (err) {
+        console.error('Erro ao cadastrar peça ou serviço:', err);
+        alert('Não foi possível salvar no catálogo. Verifique os dados e tente novamente.');
+    }
+};
+
+// ENVIANDO A ORDEM DE SERVIÇO PARA O SUPABASE
+window.salvarOS = async function() {
+    if (!estado.placa || !estado.modelo) {
+        alert("Por favor, consulte uma placa válida de veículo cadastrado antes de salvar a Ordem de Serviço!");
+        return;
+    }
+
+    if (estado.servico.estoque <= 0) {
+        alert("❌ Estoque insuficiente! Não é possível abrir uma OS para esta peça no momento.");
+        return;
+    }
+
+    const precoMaoDeObra = estado.incluirMaoDeObra ? estado.servico.precoMaoDeObra : 0;
+    const valorTotal = estado.servico.precoPeca + precoMaoDeObra;
+
+    try {
+        // Usando a variável corrigida supabaseClient
+        const { error } = await supabaseClient
+            .from('ordens_servico')
+            .insert([{
+                placa_veiculo: estado.placa,
+                servico_id: estado.servico.id,
+                valor_total: valorTotal,
+                status: 'Orçamento'
+            }]);
+
+        if (error) throw error;
+
+        const novoEstoque = estado.servico.estoque - 1;
+        const { error: erroEstoque } = await supabaseClient
+            .from('produtos_servicos')
+            .update({ estoque: novoEstoque })
+            .eq('id', estado.servico.id);
+
+        if (erroEstoque) {
+            console.error("Erro ao atualizar o estoque da peça:", erroEstoque);
+            throw erroEstoque;
+        }
+
+        estado.servico.estoque = novoEstoque;
+        await carregarDadosDoBanco();
+
+        alert(`🎯 Ordem de Serviço cadastrada com sucesso para o veículo ${estado.modelo}!`);
+        
+        estado.placa = '';
+        estado.modelo = '';
+        estado.ano = '';
+        estado.whatsapp = '';
+        renderizar();
+        
+    } catch (err) {
+        console.error("Erro ao salvar OS ou atualizar estoque:", err);
+        alert("Falha ao concluir a Ordem de Serviço e atualizar o estoque.");
+    }
+};
+
+window.enviarWhatsApp = function() {
+    if (!estado.placa || !estado.servico) {
+        alert("Consulte um veículo e selecione um serviço!");
+        return;
+    }
+
+    if (!estado.whatsapp) {
+        alert("Este veículo não possui um WhatsApp cadastrado. Atualize o cadastro do cliente.");
+        return;
+    }
+
+    const precoMaoDeObra = estado.incluirMaoDeObra ? estado.servico.precoMaoDeObra : 0;
+    const valorTotal = estado.servico.precoPeca + precoMaoDeObra;
+    const mensagem = `*⚙️ MECÂNICA PREMIUM - ORÇAMENTO*
+
+Veículo: ${estado.modelo} (${estado.ano})
+Placa: ${estado.placa}
+Serviço: ${estado.servico.nome}
+
+*Valor da Peça:* R$ ${estado.servico.precoPeca.toFixed(2)}
+Mão de Obra: ${estado.incluirMaoDeObra ? 'R$ ' + precoMaoDeObra.toFixed(2) : 'Não inclusa'}
+*💰 TOTAL ESTIMADO: R$ ${valorTotal.toFixed(2)}*
+
+Deseja aprovar o serviço?`;
+
+    const numeroLimpo = estado.whatsapp.replace(/\D/g, '');
+    const url = 'https://wa.me/' + numeroLimpo + '?text=' + encodeURIComponent(mensagem);
+    window.open(url, '_blank');
+};
+
+function renderizarCardPeca(peca) {
+    return `
+        <div class="bg-slate-900/50 border border-slate-700/60 rounded-xl p-4 flex flex-col gap-3 hover:border-slate-600 transition-all">
+            <div class="flex justify-between items-start gap-3">
+                <h5 class="font-semibold text-slate-200 text-sm leading-snug">${peca.nome}</h5>
+                <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${peca.precoPeca.toFixed(2)}</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed flex-grow">${peca.descricao}</p>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                <span class="text-xs px-2.5 py-1 rounded-md border font-semibold ${obterClasseEstoque(peca.estoque)}">${formatarEstoque(peca.estoque)}</span>
+                <span class="text-xs text-slate-500">${peca.estoque} un.</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderizarSecaoCatalogo(filtroCatalogo) {
+    const montadorasExibir = filtroCatalogo === 'Todas' ? montadoras : [filtroCatalogo];
+    const opcoesFiltro = ['Todas', ...montadoras];
+
+    return `
+        <div class="mt-12 pt-10 border-t border-slate-700/80">
+            <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                        <span>📦</span> Catálogo de Peças em Estoque
+                    </h2>
+                    <p class="text-slate-400 mt-2 text-sm">Consulte a disponibilidade de peças básicas puxadas do Supabase.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    ${opcoesFiltro.map(op => `
+                        <button
+                            onclick="alterarFiltroCatalogo('${op}')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all
+                            ${filtroCatalogo === op ? 'bg-accent border-accent text-slate-950 shadow shadow-accent/20' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}">
+                            ${op}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                ${montadorasExibir.map(m => `
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-accent mb-4 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-accent"></span>
+                            ${m}
+                            <span class="text-slate-500 font-normal normal-case tracking-normal">${servicosPorMontadora[m]?.length || 0} peças</span>
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${servicosPorMontadora[m]?.map(peca => renderizarCardPeca(peca)).join('') || ''}
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            ${opcoesFiltro.map(op => `
-                                <button
-                                    onclick="alterarFiltroCatalogo('${op}')"
-                                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition-all
-                                    ${filtroCatalogo === op ? 'bg-accent border-accent text-slate-950 shadow shadow-accent/20' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}">
-                                    ${op}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function renderizar() {
+    document.querySelectorAll('nav [data-tela]').forEach(link => {
+        const telaAtiva = link.dataset.tela === estado.telaAtual;
+        link.className = telaAtiva
+            ? 'text-accent border-b border-accent pb-1 transition-all'
+            : 'text-slate-300 hover:text-accent transition-all';
+    });
+
+    if (estado.telaAtual === 'orcamentos') {
+        if (estado.carregando) return;
+
+    const { placa, modelo, ano, montadora, servico, incluirMaoDeObra, filtroCatalogo } = estado;
+    
+    const precoMaoDeObra = incluirMaoDeObra ? (servico?.precoMaoDeObra || 0) : 0;
+    const valorTotal = (servico?.precoPeca || 0) + precoMaoDeObra;
+
+    const html = `
+        <div class="mb-8 text-center sm:text-left">
+            <h2 class="text-3xl font-extrabold text-white tracking-tight">Painel Operacional & Simulador de OS</h2>
+            <p class="text-slate-400 mt-2">Valores dinâmicos integrados diretamente ao PostgreSQL do Supabase.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
+                    
+                    <div>
+                        <label for="placa-veiculo" class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">1. Digite a Placa</label>
+                        <input
+                            id="placa-veiculo"
+                            type="text"
+                            value="${placa}"
+                            oninput="alterarPlaca(this.value)"
+                            onkeyup="if(this.value.length === 7) consultarPlacaVeiculo()"
+                            placeholder="Ex: ABC1234"
+                            maxlength="7"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 uppercase tracking-widest font-semibold focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                        />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label for="modelo-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Modelo</label>
+                                <input
+                                    id="modelo-veiculo"
+                                    type="text"
+                                    value="${modelo}"
+                                    readonly
+                                    placeholder="Aguardando placa válida..."
+                                    class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <label for="ano-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Ano</label>
+                                <input
+                                    id="ano-veiculo"
+                                    type="text"
+                                    value="${ano}"
+                                    readonly
+                                    placeholder="—"
+                                    class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">2. Filtrar Peças por Montadora</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            ${montadoras.map(m => `
+                                <button 
+                                    onclick="alterarMontadora('${m}')"
+                                    class="py-3 px-4 rounded-xl font-medium border text-sm transition-all text-center 
+                                    ${montadora === m ? 'bg-accent border-accent text-slate-950 font-bold shadow-lg shadow-accent/20' : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'}">
+                                    ${m}
                                 </button>
                             `).join('')}
                         </div>
                     </div>
 
-                    <div class="space-y-8">
-                        ${montadorasExibir.map(m => `
-                            <div>
-                                <h3 class="text-sm font-bold uppercase tracking-widest text-accent mb-4 flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-accent"></span>
-                                    ${m}
-                                    <span class="text-slate-500 font-normal normal-case tracking-normal">${servicosPorMontadora[m].length} peças</span>
-                                </h3>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    ${servicosPorMontadora[m].map(peca => renderizarCardPeca(peca)).join('')}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        // 4. Motor de Renderização (Manipulação do DOM)
-        function renderizar() {
-            const { placa, modelo, ano, montadora, servico, incluirMaoDeObra, filtroCatalogo } = estado;
-            
-            const precoMaoDeObra = incluirMaoDeObra ? servico.precoMaoDeObra : 0;
-            const valorTotal = servico.precoPeca + precoMaoDeObra;
-
-            // Construção do HTML dinâmico
-            const html = `
-                <div class="mb-8 text-center sm:text-left">
-                    <h2 class="text-3xl font-extrabold text-white tracking-tight">Simulador de Serviços e Peças</h2>
-                    <p class="text-slate-400 mt-2">Selecione o fabricante do seu veículo e configure os serviços com total transparência de valores.</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    
-                    <div class="lg:col-span-2 space-y-6">
-                        <div class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
-                            
-                            <div>
-                                <label for="placa-veiculo" class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">1. Placa do Veículo</label>
-                                <input
-                                    id="placa-veiculo"
-                                    type="text"
-                                    value="${placa}"
-                                    oninput="alterarPlaca(this.value)"
-                                    onblur="consultarPlacaVeiculo()"
-                                    placeholder="Ex: ABC1234"
-                                    maxlength="7"
-                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 uppercase tracking-widest font-semibold focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
-                                />
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                                    <div>
-                                        <label for="modelo-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Modelo</label>
-                                        <input
-                                            id="modelo-veiculo"
-                                            type="text"
-                                            value="${modelo}"
-                                            readonly
-                                            placeholder="Consulte a placa..."
-                                            class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label for="ano-veiculo" class="block text-xs font-semibold tracking-wide text-slate-400 mb-2 uppercase">Ano</label>
-                                        <input
-                                            id="ano-veiculo"
-                                            type="text"
-                                            value="${ano}"
-                                            readonly
-                                            placeholder="—"
-                                            class="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 text-sm cursor-not-allowed"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">2. Selecione a Montadora</label>
-                                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                                    ${montadoras.map(m => `
-                                        <button 
-                                            onclick="alterarMontadora('${m}')"
-                                            class="py-3 px-4 rounded-xl font-medium border text-sm transition-all text-center 
-                                            ${montadora === m ? 'bg-accent border-accent text-slate-950 font-bold shadow-lg shadow-accent/20' : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'}">
-                                            ${m}
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">3. Escolha o Componente ou Serviço</label>
-                                <div class="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
-                                    ${servicosPorMontadora[montadora].map(s => `
-                                        <div 
-                                            onclick="alterarServico('${s.id}')"
-                                            class="p-4 rounded-xl border cursor-pointer transition-all 
-                                            ${servico.id === s.id ? 'bg-slate-900/80 border-accent' : 'bg-slate-900/40 border-slate-700/60 hover:border-slate-600'}">
-                                            <div class="flex justify-between items-start gap-4">
-                                                <div class="flex-grow">
-                                                    <h4 class="font-semibold text-slate-200">${s.nome}</h4>
-                                                    <p class="text-xs text-slate-400 mt-1">${s.descricao}</p>
-                                                    <span class="inline-block text-xs px-2 py-0.5 rounded-md border font-medium mt-2 ${obterClasseEstoque(s.estoque)}">${formatarEstoque(s.estoque)}</span>
-                                                </div>
-                                                <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${s.precoPeca.toFixed(2)}</span>
-                                            </div>
+                    <div>
+                        <label class="block text-sm font-semibold tracking-wide text-slate-300 mb-3 uppercase">3. Escolha o Componente</label>
+                        <div class="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
+                            ${servicosPorMontadora[montadora]?.map(s => `
+                                <div 
+                                    onclick="alterarServico('${s.id}')"
+                                    class="p-4 rounded-xl border cursor-pointer transition-all 
+                                    ${servico?.id === s.id ? 'bg-slate-900/80 border-accent' : 'bg-slate-900/40 border-slate-700/60 hover:border-slate-600'}">
+                                    <div class="flex justify-between items-start gap-4">
+                                        <div class="flex-grow">
+                                            <h4 class="font-semibold text-slate-200">${s.nome}</h4>
+                                            <p class="text-xs text-slate-400 mt-1">${s.descricao}</p>
+                                            <span class="inline-block text-xs px-2 py-0.5 rounded-md border font-medium mt-2 ${obterClasseEstoque(s.estoque)}">${formatarEstoque(s.estoque)}</span>
                                         </div>
-                                    `).join('')}
+                                        <span class="text-sm font-bold text-slate-300 whitespace-nowrap">R$ ${s.precoPeca.toFixed(2)}</span>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div>
-                                    <h4 class="font-semibold text-slate-200">Modalidade de Contratação</h4>
-                                    <p class="text-xs text-slate-400">Escolha se deseja incluir a instalação profissional ou apenas retirar a peça.</p>
-                                </div>
-                                <div class="flex items-center bg-slate-900 p-1.5 rounded-xl border border-slate-700">
-                                    <button onclick="alterarMaoDeObra(false)" class="px-4 py-2 text-xs font-bold rounded-lg transition-all ${!incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}">Apenas Peça</button>
-                                    <button onclick="alterarMaoDeObra(true)" class="px-4 py-2 text-xs font-bold rounded-lg transition-all ${incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}">Peça + Instalação</button>
-                                </div>
-                            </div>
-
+                            `).join('') || '<p class="text-xs text-slate-500">Selecione uma montadora.</p>'}
                         </div>
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-600 shadow-2xl relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl"></div>
-                            <h3 class="text-lg font-bold tracking-wide text-white border-b border-slate-700 pb-4 mb-4 flex items-center gap-2">
-                                <span>📋</span> Resumo do Orçamento
-                            </h3>
+                    <div class="pt-4 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h4 class="font-semibold text-slate-200">Mão de Obra do Mecânico</h4>
+                            <p class="text-xs text-slate-400">Determina se o serviço de instalação profissional entrará no cálculo final.</p>
+                        </div>
+                        <div class="flex items-center bg-slate-900 p-1.5 rounded-xl border border-slate-700">
+                            <button onclick="alterarMaoDeObra(false)" class="px-4 py-2 text-xs font-bold rounded-lg transition-all ${!incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}">Apenas Peça</button>
+                            <button onclick="alterarMaoDeObra(true)" class="px-4 py-2 text-xs font-bold rounded-lg transition-all ${incluirMaoDeObra ? 'bg-slate-800 text-accent border border-slate-600 shadow' : 'text-slate-400'}">Peça + Instalação</button>
+                        </div>
+                    </div>
 
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400">Placa:</span>
-                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800 uppercase tracking-wider">${placa || 'Não informada'}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400">Modelo:</span>
-                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${modelo || 'Não informado'}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400">Ano:</span>
-                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${ano || 'Não informado'}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400">Montadora:</span>
-                                    <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${montadora}</span>
-                                </div>
-                                <div class="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 leading-relaxed">
-                                    <span class="font-semibold text-accent block mb-0.5">Item selecionado:</span>
-                                    ${servico.nome}
-                                </div>
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-400">Disponibilidade:</span>
-                                    <span class="text-xs px-2.5 py-1 rounded-md border font-semibold ${obterClasseEstoque(servico.estoque)}">${formatarEstoque(servico.estoque)}</span>
-                                </div>
+                </div>
+            </div>
 
-                                <div class="pt-2 space-y-2 border-t border-slate-700/60">
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-slate-400">Valor bruto da peça:</span>
-                                        <span class="font-medium text-slate-200">R$ ${servico.precoPeca.toFixed(2)}</span>
-                                    </div>
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-slate-400">Mão de obra / Serviço:</span>
-                                        <span class="font-medium text-slate-200">${incluirMaoDeObra ? `R$ ${precoMaoDeObra.toFixed(2)}` : 'Não inclusa'}</span>
-                                    </div>
-                                </div>
+            <div class="space-y-6">
+                <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-6 rounded-2xl border border-slate-600 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl"></div>
+                    <h3 class="text-lg font-bold tracking-wide text-white border-b border-slate-700 pb-4 mb-4 flex items-center gap-2">
+                        <span>📋</span> Resumo da OS
+                    </h3>
 
-                                <div class="pt-4 border-t-2 border-dashed border-slate-700 bg-slate-950/60 p-4 rounded-xl text-center">
-                                    <span class="text-xs uppercase tracking-widest font-bold text-slate-400 block mb-1">Valor Total Estimado</span>
-                                    <span class="text-3xl font-black text-accent tracking-tight">R$ ${valorTotal.toFixed(2)}</span>
-                                </div>
-                                
-                                <button class="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] mt-2 text-center text-sm uppercase tracking-wider">
-                                    Agendar Manutenção
-                                </button>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Placa:</span>
+                            <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800 uppercase tracking-wider">${placa || 'Aguardando...'}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Modelo:</span>
+                            <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${modelo || 'Aguardando...'}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Ano:</span>
+                            <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${ano || '—'}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Fabricante:</span>
+                            <span class="font-semibold text-slate-200 bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">${montadora}</span>
+                        </div>
+                        <div class="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 leading-relaxed">
+                            <span class="font-semibold text-accent block mb-0.5">Item Selecionado:</span>
+                            ${servico ? servico.nome : 'Nenhum'}
+                        </div>
+
+                        <div class="pt-2 space-y-2 border-t border-slate-700/60">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Valor Bruto do Componente:</span>
+                                <span class="font-medium text-slate-200">R$ ${servico ? servico.precoPeca.toFixed(2) : '0.00'}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Serviço de Montagem:</span>
+                                <span class="font-medium text-slate-200">${incluirMaoDeObra && servico ? `R$ ${precoMaoDeObra.toFixed(2)}` : 'Não inclusa'}</span>
                             </div>
                         </div>
 
-                        <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 space-y-3.5">
-                            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400">Diferenciais Técnicos ${montadora}</h4>
-                            <ul class="text-xs space-y-2.5 text-slate-300">
-                                <li class="flex items-center gap-2"><span class="text-accent text-sm">✓</span> Equipamentos de diagnóstico dedicados aos protocolos da ${montadora}.</li>
-                                <li class="flex items-center gap-2"><span class="text-accent text-sm">✓</span> Garantia estendida de 1 ano para peças adquiridas e instaladas em nossa estrutura.</li>
-                                <li class="flex items-center gap-2"><span class="text-accent text-sm">✓</span> Mecânicos treinados com ferramentais de precisão (torquímetros digitais).</li>
-                            </ul>
+                        <div class="pt-4 border-t-2 border-dashed border-slate-700 bg-slate-950/60 p-4 rounded-xl text-center">
+                            <span class="text-xs uppercase tracking-widest font-bold text-slate-400 block mb-1">Total Geral da Ordem</span>
+                            <span class="text-3xl font-black text-accent tracking-tight">R$ ${valorTotal.toFixed(2)}</span>
                         </div>
+                        
+                        <button onclick="salvarOS()" class="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] mt-2 text-center text-sm uppercase tracking-wider">
+                            Salvar Ordem de Serviço
+                        </button>
+                        <button onclick="enviarWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-[0.99] mt-3 text-center text-sm uppercase tracking-wider">📱 Enviar via WhatsApp</button>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                ${renderizarSecaoCatalogo(filtroCatalogo)}
+        ${renderizarSecaoCatalogo(filtroCatalogo)}
+    `;
+    
+    const focoPlaca = document.activeElement?.id === 'placa-veiculo';
+    const posicaoCursor = focoPlaca ? document.activeElement.selectionStart : null;
+
+    document.getElementById('app').innerHTML = html;
+
+    if (focoPlaca) {
+        const inputPlaca = document.getElementById('placa-veiculo');
+        if (inputPlaca) {
+            inputPlaca.focus();
+            inputPlaca.setSelectionRange(posicaoCursor, posicaoCursor);
+        }
+    }
+    } else if (estado.telaAtual === 'cadastro') {
+        document.getElementById('app').innerHTML = `
+            <div class="mb-8 text-center sm:text-left">
+                <h2 class="text-3xl font-extrabold text-white tracking-tight">Área de Cadastro</h2>
+                <p class="text-slate-400 mt-2">Cadastre veículos e mantenha o catálogo de peças e serviços atualizado.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl">
+                    <div class="mb-6 pb-4 border-b border-slate-700">
+                        <h3 class="text-xl font-bold text-white">Cadastrar Novo Veículo</h3>
+                        <p class="text-sm text-slate-400 mt-1">Informe os dados básicos para consultar o veículo pela placa.</p>
+                    </div>
+
+                    <form id="form-cadastro-veiculo" class="space-y-5" autocomplete="off">
+                        <div>
+                            <label for="cadastro-veiculo-placa" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Placa</label>
+                            <input
+                                id="cadastro-veiculo-placa"
+                                type="text"
+                                maxlength="7"
+                                required
+                                oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 7)"
+                                placeholder="Ex: ABC1D23"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 uppercase tracking-widest font-semibold focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="cadastro-veiculo-whatsapp" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">WhatsApp do Cliente</label>
+                            <input
+                                id="cadastro-veiculo-whatsapp"
+                                type="tel"
+                                inputmode="numeric"
+                                maxlength="15"
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15)"
+                                placeholder="Ex: 5511999999999"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="cadastro-veiculo-montadora" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Montadora</label>
+                            <select id="cadastro-veiculo-montadora" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
+                                <option value="">Selecione uma montadora</option>
+                                <option value="Honda">Honda</option>
+                                <option value="Fiat">Fiat</option>
+                                <option value="Volkswagen">Volkswagen</option>
+                                <option value="Chevrolet">Chevrolet</option>
+                                <option value="Toyota">Toyota</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="cadastro-veiculo-modelo" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Modelo</label>
+                            <input
+                                id="cadastro-veiculo-modelo"
+                                type="text"
+                                required
+                                placeholder="Ex: Civic Touring"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                            />
+                        </div>
+
+                        <div>
+                            <label for="cadastro-veiculo-ano" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Ano</label>
+                            <input
+                                id="cadastro-veiculo-ano"
+                                type="number"
+                                min="1900"
+                                max="2100"
+                                step="1"
+                                required
+                                placeholder="Ex: 2024"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                            />
+                        </div>
+
+                        <button type="button" onclick="cadastrarVeiculo()" class="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] text-sm uppercase tracking-wider">
+                            Salvar Veículo
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-cardBg p-6 rounded-2xl border border-slate-700 shadow-xl">
+                    <div class="mb-6 pb-4 border-b border-slate-700">
+                        <h3 class="text-xl font-bold text-white">Cadastrar Nova Peça / Serviço</h3>
+                        <p class="text-sm text-slate-400 mt-1">Adicione um novo componente ao catálogo integrado ao Supabase.</p>
+                    </div>
+
+                    <form id="form-cadastro-produto" class="space-y-5" autocomplete="off">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label for="cadastro-produto-id" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">ID Único</label>
+                                <input
+                                    id="cadastro-produto-id"
+                                    type="text"
+                                    maxlength="20"
+                                    required
+                                    placeholder="Ex: h8"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="cadastro-produto-nome" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Nome do Componente</label>
+                                <input
+                                    id="cadastro-produto-nome"
+                                    type="text"
+                                    required
+                                    placeholder="Ex: Kit de Embreagem"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="cadastro-produto-preco-peca" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Preço da Peça</label>
+                                <input
+                                    id="cadastro-produto-preco-peca"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                    placeholder="0,00"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label for="cadastro-produto-preco-mao-obra" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Preço da Mão de Obra</label>
+                                <input
+                                    id="cadastro-produto-preco-mao-obra"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                    placeholder="0,00"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="cadastro-produto-descricao" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Descrição</label>
+                            <textarea
+                                id="cadastro-produto-descricao"
+                                rows="3"
+                                required
+                                placeholder="Descreva brevemente a peça ou o serviço..."
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 resize-none focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                            ></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="cadastro-produto-estoque" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Estoque Inicial</label>
+                                <input
+                                    id="cadastro-produto-estoque"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    required
+                                    placeholder="Ex: 10"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label for="cadastro-produto-montadora" class="block text-sm font-semibold tracking-wide text-slate-300 mb-2 uppercase">Montadora</label>
+                                <select id="cadastro-produto-montadora" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all">
+                                    <option value="">Selecione uma montadora</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Fiat">Fiat</option>
+                                    <option value="Volkswagen">Volkswagen</option>
+                                    <option value="Chevrolet">Chevrolet</option>
+                                    <option value="Toyota">Toyota</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="cadastrarProduto()" class="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] text-sm uppercase tracking-wider">
+                            Salvar no Catálogo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `;
+    } else if (estado.telaAtual === 'ordens') {
+        let htmlOrdens = `
+            <div class="mb-8 text-center sm:text-left">
+                <h2 class="text-3xl font-extrabold text-white tracking-tight">Painel de Ordens de Serviço</h2>
+                <p class="text-slate-400 mt-2">Acompanhe as ordens salvas e atualize o andamento de cada serviço.</p>
+            </div>
+
+            <div class="bg-cardBg rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[850px] text-left">
+                        <thead class="bg-slate-900 border-b border-slate-700">
+                            <tr class="text-xs uppercase tracking-wider text-slate-400">
+                                <th class="px-6 py-4 font-semibold">OS</th>
+                                <th class="px-6 py-4 font-semibold">Data</th>
+                                <th class="px-6 py-4 font-semibold">Placa do Veículo</th>
+                                <th class="px-6 py-4 font-semibold">Valor Total</th>
+                                <th class="px-6 py-4 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/70">
+                            ${estado.ordensSalvas.length > 0 ? estado.ordensSalvas.map(ordem => `
+                                <tr class="bg-slate-900/40 hover:bg-slate-900/70 transition-all">
+                                    <td class="px-6 py-4">
+                                        <button onclick="abrirDetalhesOS(${ordem.id})" class="text-accent font-bold hover:underline hover:text-accentHover transition-all">#${ordem.id}</button>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-300 whitespace-nowrap">${formatarDataOS(ordem.created_at)}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex text-sm font-semibold text-slate-200 bg-slate-950 px-3 py-1 rounded-md border border-slate-700 uppercase tracking-wider">${ordem.placa_veiculo || '—'}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-bold text-slate-200 whitespace-nowrap">${formatarValorEmReais(ordem.valor_total)}</td>
+                                    <td class="px-6 py-4">
+                                        <select
+                                            onchange="atualizarStatusOS(${ordem.id}, this.value)"
+                                            class="w-full min-w-44 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+                                        >
+                                            ${['Orçamento', 'Em Manutenção', 'Concluído'].map(status => `
+                                                <option value="${status}" ${ordem.status === status ? 'selected' : ''}>${status}</option>
+                                            `).join('')}
+                                        </select>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr class="bg-slate-900/30">
+                                    <td colspan="5" class="px-6 py-14 text-center text-slate-400">
+                                        Nenhuma ordem de serviço encontrada.
+                                    </td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        if (estado.osSelecionada) {
+            htmlOrdens += `
+                <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl relative">
+                        <button
+                            onclick="fecharDetalhesOS()"
+                            class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all"
+                            aria-label="Fechar detalhes"
+                        >
+                            ✕
+                        </button>
+
+                        <div class="pr-12 pb-4 border-b border-slate-700">
+                            <h3 class="text-2xl font-bold text-white">Detalhes da OS #${estado.osSelecionada.id}</h3>
+                            <p class="text-sm text-slate-400 mt-1">Resumo completo da ordem de serviço.</p>
+                        </div>
+
+                        <div class="py-6 space-y-5">
+                            <div>
+                                <span class="block text-xs uppercase tracking-wider font-semibold text-slate-500 mb-2">Placa do Veículo</span>
+                                <span class="inline-flex text-sm font-bold text-slate-200 bg-slate-950 px-3 py-1.5 rounded-md border border-slate-700 uppercase tracking-widest">${estado.osSelecionada.placa_veiculo || '—'}</span>
+                            </div>
+
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <span class="block text-xs uppercase tracking-wider font-semibold text-slate-500 mb-2">Peça / Serviço</span>
+                                <span class="font-semibold text-slate-200">${estado.osSelecionada.detalhesPeca?.nome || 'Peça ou serviço não encontrado'}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-4">
+                                <span class="text-sm text-slate-400">Status atual</span>
+                                <span class="text-sm font-semibold text-accent bg-accent/10 border border-accent/30 px-3 py-1 rounded-full">${estado.osSelecionada.status || 'Não informado'}</span>
+                            </div>
+
+                            <div class="flex items-end justify-between gap-4 pt-4 border-t border-slate-700">
+                                <span class="text-sm text-slate-400">Valor Total</span>
+                                <span class="text-2xl font-black text-white">${formatarValorEmReais(estado.osSelecionada.valor_total)}</span>
+                            </div>
+                        </div>
+
+                        <button onclick="fecharDetalhesOS()" class="w-full bg-accent hover:bg-accentHover text-slate-950 font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg shadow-accent/10 active:scale-[0.99] text-sm uppercase tracking-wider">
+                            Fechar Resumo
+                        </button>
+                    </div>
+                </div>
             `;
-            
-            const focoPlaca = document.activeElement?.id === 'placa-veiculo';
-            const posicaoCursor = focoPlaca ? document.activeElement.selectionStart : null;
-
-            document.getElementById('app').innerHTML = html;
-
-            if (focoPlaca) {
-                const inputPlaca = document.getElementById('placa-veiculo');
-                if (inputPlaca) {
-                    inputPlaca.focus();
-                    inputPlaca.setSelectionRange(posicaoCursor, posicaoCursor);
-                }
-            }
         }
 
-        // 5. Inicialização
-        document.addEventListener('DOMContentLoaded', renderizar);
+        document.getElementById('app').innerHTML = htmlOrdens;
+    }
+}
 
+// Evento Inicializador
+document.addEventListener('DOMContentLoaded', carregarDadosDoBanco);
     </script>
 </body>
 </html>
